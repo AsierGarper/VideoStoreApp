@@ -7,7 +7,7 @@ namespace VideoStoreApp
 {
     class LoginMenu
     {
-        public static void Menu()
+        public static void MainMenu()
         {
             //aqui crear, con metodos, el login, el register y el logout. Si es satisfactorio el login, pasar a MoviesMenu
             bool menu = true;
@@ -43,7 +43,7 @@ namespace VideoStoreApp
                 string customerDni = Console.ReadLine();
                 if (customerDni.ToLower() == "back") //This 'if-else' is just to let the user go back to the main menu. We convert the string ToLower just if the user writes 'Back' or 'BACK'
                 {
-                    Menu();
+                    MainMenu();
                 }
                 else
                 {
@@ -53,10 +53,19 @@ namespace VideoStoreApp
 
                     if (sqlData.Reader.Read())
                     {
+                        //If the DNI is correct, we will save the data in the Customer object, and thus follow the flow of the program with the credentials of THAT user, or until he/she logs out.
+                        Customer.Dni = Convert.ToString(sqlData.Reader[1]);
+                        Customer.Name = Convert.ToString(sqlData.Reader[2]);
+                        Customer.LastName = Convert.ToString(sqlData.Reader[3]);
+                        Customer.Birthday = Convert.ToDateTime(sqlData.Reader[4]);
+                        Customer.Mail = Convert.ToString(sqlData.Reader[5]);
+                        Customer.Password = Convert.ToString(sqlData.Reader[6]);
+                        //And this way, we have stored in the Customer class the values of the user navigating through the application. These values are going to be able to be called from anywhere, using the Customer class as a bridge.
+                        
                         sqlData.Connection.Close();//Si el DNI existe, cerramos conexion.
-                        loginMenu = false; //De esta forma, cuando exista el DNI en la BD, evitamos que vuelva entrar en el while.
+                        loginMenu = false; //In this way, when the DNI exists in the DB, we prevent it from re-entering the while.
                         Console.WriteLine("Successful login.");
-                        MoviesMenu.ShowMenu();//Si el inicio de sesion es correcto, enseniar el menu de peliculas
+                        MoviesMenu.ShowMenu();//If the login is correct, show the movie menu.
                     }
                     else
                     {
@@ -78,7 +87,7 @@ namespace VideoStoreApp
                 string newDni = Console.ReadLine();//MEJORA, PEDIR DNI DE 9 CARACTERES MAXIMO
                 if (newDni.ToLower() == "back") //This 'if-else' is just to let the user go back to the main menu. We convert the string ToLower just if the user writes 'Back' or 'BACK'
                 {
-                    Menu();
+                    MainMenu();
                 }
                 else
                 {
@@ -122,13 +131,13 @@ namespace VideoStoreApp
                                 break;
                             }
                         }
-                        string convertedPassword = new string(newPassword); 
+                        string convertedPassword = new string(newPassword);
                         //-----------------------------------La variable newPassword es en formato *****, la variable 'convertedPassword' es la convertida a string (la legible), la que pasamos al query--------------------------------
                         //Aqui, recogemos las variables del cliente para registrarlo en la Base de datos.
                         string queryInsert = $"INSERT INTO Customer (Dni, Name, LastName, Birthday, Mail, Password) VALUES ('{newDni}','{newName}', '{newLastName}', '{newBirthday}', '{newMail}','{convertedPassword}')";
                         DTOReaderAndConnection sqlData2 = DatabaseConnections.QueryExecute(queryInsert);
                         Console.WriteLine("Registration completed! You will be redirected to the main menu. Log in to book your first movie.\n");
-                        Menu();
+                        MainMenu();
                     }
                     sqlData.Connection.Close(); //Si no existe el DNI, cerramos conexion, y vuelve al while 
                 }

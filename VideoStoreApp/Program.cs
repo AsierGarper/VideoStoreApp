@@ -6,7 +6,7 @@ namespace VideoStoreApp
     {
         static void Main(string[] args)
         {
-            LoginMenu.Menu();
+            LoginMenu.MainMenu();
         }
     }
 }
