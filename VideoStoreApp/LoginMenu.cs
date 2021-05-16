@@ -15,7 +15,7 @@ namespace VideoStoreApp
             {
                 Console.WriteLine("Welcome to the most famous Videostore in your town! Log in to access the largest movie catalog on the internet!");
                 Console.WriteLine("Select the option you want to perform:");
-                Console.WriteLine("\n 1-Login \n 2-Register \n 3-Logout\n");
+                Console.WriteLine("\n 1-Login \n 2-Register\n"); //\n 3-Logout METER MAS ADELANTE
                 int selection = Convert.ToInt32(Console.ReadLine());
 
                 switch (selection)
@@ -39,7 +39,7 @@ namespace VideoStoreApp
             bool loginMenu = true;
             while (loginMenu)
             {
-                Console.WriteLine("Introduce your identification number (DNI): \t\t\t\t\t (To go back to the menu, press 'back')");
+                Console.WriteLine("Introduce your identification number (DNI): \t\t\t\t\t (To go back to the menu, type 'back')");
                 string customerDni = Console.ReadLine();
                 if (customerDni.ToLower() == "back") //This 'if-else' is just to let the user go back to the main menu. We convert the string ToLower just if the user writes 'Back' or 'BACK'
                 {
@@ -53,19 +53,23 @@ namespace VideoStoreApp
 
                     if (sqlData.Reader.Read())
                     {
-                        //If the DNI is correct, we will save the data in the Customer object, and thus follow the flow of the program with the credentials of THAT user, or until he/she logs out.
-                        Customer.Dni = Convert.ToString(sqlData.Reader[1]);
-                        Customer.Name = Convert.ToString(sqlData.Reader[2]);
-                        Customer.LastName = Convert.ToString(sqlData.Reader[3]);
-                        Customer.Birthday = Convert.ToDateTime(sqlData.Reader[4]);
-                        Customer.Mail = Convert.ToString(sqlData.Reader[5]);
-                        Customer.Password = Convert.ToString(sqlData.Reader[6]);
+                        //If the DNI is correct, we will save the data in the Customer customerData object, and this follow the flow of the program with the credentials of THAT user, or until he/she logs out.
+                        Customer customerData = new Customer(
+                            Convert.ToInt32(sqlData.Reader["Customer_id"]),
+                            Convert.ToString(sqlData.Reader["Dni"]),
+                            Convert.ToString(sqlData.Reader["Name"]),
+                            Convert.ToString(sqlData.Reader["LastName"]),
+                            Convert.ToDateTime(sqlData.Reader["Birthday"]),
+                            Convert.ToString(sqlData.Reader["Mail"]),
+                            Convert.ToString(sqlData.Reader["Password"])
+                            );
+
                         //And this way, we have stored in the Customer class the values of the user navigating through the application. These values are going to be able to be called from anywhere, using the Customer class as a bridge.
-                        
+
                         sqlData.Connection.Close();//Si el DNI existe, cerramos conexion.
                         loginMenu = false; //In this way, when the DNI exists in the DB, we prevent it from re-entering the while.
                         Console.WriteLine("Successful login.");
-                        MoviesMenu.ShowMenu();//If the login is correct, show the movie menu.
+                        MoviesMenu.ShowMenu(customerData);//If the login is correct, show the movie menu.
                     }
                     else
                     {
@@ -73,9 +77,7 @@ namespace VideoStoreApp
                     }
                     sqlData.Connection.Close(); //Si no existe el DNI, cerramos conexion, y vuelve al while 
                 }
-
             }
-
         }
 
         public static void Register()
@@ -136,7 +138,8 @@ namespace VideoStoreApp
                         //Aqui, recogemos las variables del cliente para registrarlo en la Base de datos.
                         string queryInsert = $"INSERT INTO Customer (Dni, Name, LastName, Birthday, Mail, Password) VALUES ('{newDni}','{newName}', '{newLastName}', '{newBirthday}', '{newMail}','{convertedPassword}')";
                         DTOReaderAndConnection sqlData2 = DatabaseConnections.QueryExecute(queryInsert);
-                        Console.WriteLine("Registration completed! You will be redirected to the main menu. Log in to book your first movie.\n");
+                        sqlData2.Connection.Close();
+                        Console.WriteLine("\nRegistration completed! You will be redirected to the main menu. Log in to book your first movie.\n");
                         MainMenu();
                     }
                     sqlData.Connection.Close(); //Si no existe el DNI, cerramos conexion, y vuelve al while 
@@ -145,5 +148,29 @@ namespace VideoStoreApp
             }
 
         }
+
+        public static void Logout()
+        {
+            Console.WriteLine("Are you sure to logout? Yes/No");
+            string logoutAnswer = Console.ReadLine();
+
+            if (logoutAnswer == "yes")
+            {
+                Console.WriteLine("You have logout succesfully.");
+                //AQUI DEBERIA OLVIDAR EL CONTRUCTOR, Y NO SE COMO HACERLO
+                MainMenu();
+            }
+            else if (logoutAnswer == "no")
+            {
+                Console.WriteLine("You have been redirected to the main menu.\n");
+                MainMenu();
+            }
+            else
+            {
+                Console.WriteLine("I don't understand what you mean. You have been redirected to the main menu.\n");
+                MainMenu();
+            }
+        }
     }
+
 }
