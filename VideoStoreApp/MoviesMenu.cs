@@ -37,7 +37,7 @@ namespace VideoStoreApp
                         //Tiene que tener la opcion de DEVOLVER PELICULA, 
                         break;
                     case 4:
-                        //Logout();
+                        Logout(customerData);
                         break;
                     default:
                         break;
@@ -114,7 +114,7 @@ namespace VideoStoreApp
             //string rentingAnswer = Console.ReadLine();
             //if (rentingAnswer.ToLower() == "yes")
             //{
-            //    RentMovie(customerAge);
+            //    RentMovie(customerData);
             //}
             //else if (rentingAnswer.ToLower() == "no")
             //{
@@ -163,9 +163,84 @@ namespace VideoStoreApp
             Console.ForegroundColor = ConsoleColor.White;
         }
 
-        public static void CustomerReservations()
+        public static void CustomerReservations(Customer customer)
         {
+            Console.WriteLine("Your reservations:\n");
+            string query = $"select Reservation_id, RentDay, MaxReturnDate, title from Reservation r, Film f where f.Film_id = r.Film_id and Customer_id = {customer.Customer_id}";
+            DTOReaderAndConnection sqlData = DatabaseConnections.QueryExecute(query);
+            while (sqlData.Reader.Read())
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Reservation Id: " + sqlData.Reader["Reservation_id"]);
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.WriteLine("Film title: " + sqlData.Reader["title"]);
+                Console.WriteLine("Rental date: " + sqlData.Reader["RentDay"]);
+                Console.ForegroundColor = ConsoleColor.Blue;
+                Console.WriteLine($"Maximum return date:  {(sqlData.Reader["MaxReturnDate"])}");
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.WriteLine("\nDo you want to return a movie? Yes/Back");
+                string answer = Console.ReadLine();
+                if (answer.ToLower() == "yes")
+                {
+                    sqlData.Connection.Close();
+                    //AQUI HABRIA QUE METER UN TRY CATCH
+                    Console.WriteLine("Select the reservation id you want to return. Type 'back' to go back to main menu.");
+                    //If the customer wants to return a movie, it will be necessary to do an update in the Film table and a delete in the Reservation table.
+                    string selectedId = Console.ReadLine();
+                    if (selectedId.ToLower() == "back")
+                    {
+                        sqlData.Connection.Close();
+                        Console.WriteLine("Okay, you have been redirected to Main Menu.");
+                        ShowMenu(customer);
+                    }
+                    else
+                    {
+                        sqlData.Connection.Close();
+                        string queryUpdate = $"UPDATE Film set Available = 0 where Film_id = {selectedId}";
+                        //ME HE QUEDADO AQUI
+                        //QUERY DELETE
+                    }
 
+                }
+                else if (answer.ToLower() == "no" || answer.ToLower() == "back")
+                {
+                    Console.WriteLine("Okay, you have been redirected to Main Menu.");
+                    ShowMenu(customer);
+                }
+                else
+                {
+                    Console.WriteLine("I don't understand what you mean. You have been redirected to Main Menu.");
+                    ShowMenu(customer);
+                }
+
+            }
+            sqlData.Connection.Close();
+            Console.WriteLine("There are no reserves. Try to do a reservation in '2- Rent a movie' section.");
+            ShowMenu(customer);
+        }
+
+
+
+        public static void Logout(Customer customer)
+        {
+            Console.WriteLine("Are you sure to logout? Yes/No");
+            string logoutAnswer = Console.ReadLine();
+
+            if (logoutAnswer == "yes")
+            {
+                Console.WriteLine("You have logout succesfully\n.");
+                LoginMenu.MainMenu();
+            }
+            else if (logoutAnswer == "no")
+            {
+                Console.WriteLine("You have been redirected to the main menu.\n");
+                ShowMenu(customer);
+            }
+            else
+            {
+                Console.WriteLine("I don't understand what you mean. You have been redirected to the main menu.\n");
+                ShowMenu(customer);
+            }
         }
     }
 }

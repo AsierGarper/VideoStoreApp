@@ -17,7 +17,7 @@ namespace VideoStoreApp
             
             SqlCommand command = new SqlCommand(query, connection); //Se crea el objeto con el mensaje a enviar y la conexion a la que enviarselo
             connection.Open(); //Abro la conexion
-            if (query.Contains("SELECT")) //Como en las SELECT el reader tiene que devolver algo, hacemos eso.
+            if (query.ToUpper().Contains("SELECT")) //Como en las SELECT el reader tiene que devolver algo, hacemos eso.
             {
                 sqlData.Reader = command.ExecuteReader(); //Ejecuta el comando donde tengo la query y la conexion
             }
@@ -27,8 +27,8 @@ namespace VideoStoreApp
             }
            
             return sqlData;
-            
-            //Recuerda cerrar la conexxion siempre despues de realizar cada reader, en su clase correspondiente
+
+            //Remember to always close the connection after each reader, in its corresponding class.
         }
 
     }

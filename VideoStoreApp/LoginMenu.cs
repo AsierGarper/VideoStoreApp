@@ -26,9 +26,6 @@ namespace VideoStoreApp
                     case 2:
                         Register();
                         break;
-                    case 3:
-                        //Logout(); Deberia hacer que solo apareciera una vez logeados en el menu
-                        break;
                     default:
                         break;
                 }
@@ -86,7 +83,7 @@ namespace VideoStoreApp
             while (loginMenu)
             {
                 Console.WriteLine("To create a new user, introduce your identification number (DNI): \t\t (To go back to the menu, press 'back')");
-                string newDni = Console.ReadLine();//MEJORA, PEDIR DNI DE 9 CARACTERES MAXIMO
+                string newDni = Console.ReadLine();//IMPROVEMENT, ASK FOR A 9-CHARACTER ID MAX.
                 if (newDni.ToLower() == "back") //This 'if-else' is just to let the user go back to the main menu. We convert the string ToLower just if the user writes 'Back' or 'BACK'
                 {
                     MainMenu();
@@ -99,7 +96,7 @@ namespace VideoStoreApp
 
                     if (sqlData.Reader.Read())
                     {
-                        Console.WriteLine("DNI already in use.");//MEJORA POSIBLE: DAR AL USUARIO LA OPCION DE SALTAR A LOG IN
+                        Console.WriteLine("DNI already in use.");//POSSIBLE IMPROVEMENT: GIVE THE USER THE OPTION TO SKIP TO LOG IN
                     }
                     else
                     {
@@ -113,7 +110,7 @@ namespace VideoStoreApp
                         Console.WriteLine("Introduce your mail.");
                         string newMail = Console.ReadLine();
                         Console.WriteLine("Introduce your Password.");
-                        //Aqui vamos a meter un codigo sacado de internet, para que aparezcan * en vez de la contrasenia:
+                        //Here we are going to enter a code taken from the internet, so that * appears instead of the password:
                         //-----------------------------------------------
                         char[] newPassword = new char[35]; //Assign the max length of password you want
                         ConsoleKeyInfo keyinfo = new ConsoleKeyInfo();
@@ -134,43 +131,21 @@ namespace VideoStoreApp
                             }
                         }
                         string convertedPassword = new string(newPassword);
-                        //-----------------------------------La variable newPassword es en formato *****, la variable 'convertedPassword' es la convertida a string (la legible), la que pasamos al query--------------------------------
-                        //Aqui, recogemos las variables del cliente para registrarlo en la Base de datos.
+                        //-----------------------------------The variable newPassword is in format *****, the variable 'convertedPassword' is the one converted to string (the readable one), the one that we pass to the query--------------------------------
+                        //Here, we collect the variables of the client to register it in the database.
                         string queryInsert = $"INSERT INTO Customer (Dni, Name, LastName, Birthday, Mail, Password) VALUES ('{newDni}','{newName}', '{newLastName}', '{newBirthday}', '{newMail}','{convertedPassword}')";
                         DTOReaderAndConnection sqlData2 = DatabaseConnections.QueryExecute(queryInsert);
                         sqlData2.Connection.Close();
                         Console.WriteLine("\nRegistration completed! You will be redirected to the main menu. Log in to book your first movie.\n");
                         MainMenu();
                     }
-                    sqlData.Connection.Close(); //Si no existe el DNI, cerramos conexion, y vuelve al while 
+                    sqlData.Connection.Close(); //If the DNI does not exist, close the connection, and return to while 
                 }
 
             }
 
         }
 
-        public static void Logout()
-        {
-            Console.WriteLine("Are you sure to logout? Yes/No");
-            string logoutAnswer = Console.ReadLine();
-
-            if (logoutAnswer == "yes")
-            {
-                Console.WriteLine("You have logout succesfully.");
-                //AQUI DEBERIA OLVIDAR EL CONTRUCTOR, Y NO SE COMO HACERLO
-                MainMenu();
-            }
-            else if (logoutAnswer == "no")
-            {
-                Console.WriteLine("You have been redirected to the main menu.\n");
-                MainMenu();
-            }
-            else
-            {
-                Console.WriteLine("I don't understand what you mean. You have been redirected to the main menu.\n");
-                MainMenu();
-            }
-        }
     }
 
 }
