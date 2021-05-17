@@ -109,12 +109,12 @@ namespace VideoStoreApp
             Console.WriteLine("Type 'back' to view available films.");
 
 
-            //------------------------AlQUILAR PELICULA DESDE INFO EXTRA DE LA PELICULA------------------------
+            //------------------------FUTURE UPDATE: RENT A MOVIE FROM EXTRA MOVIE INFO------------------------
             //Console.WriteLine("\nDo you want this rent a movie? Yes/No");
             //string rentingAnswer = Console.ReadLine();
             //if (rentingAnswer.ToLower() == "yes")
             //{
-            //    RentMovie(customerData);
+            //    RentMovie(customer);
             //}
             //else if (rentingAnswer.ToLower() == "no")
             //{
@@ -139,11 +139,11 @@ namespace VideoStoreApp
             {
                 Console.WriteLine("\nId:" + sqlData.Reader["Film_id"].ToString());
                 Console.WriteLine("\nTitle:" + sqlData.Reader["Title"].ToString());
-
             }
             sqlData.Connection.Close();
             Console.WriteLine("\nSelect one id for your reservation (for 2 days)");
             string answer = Console.ReadLine();
+
             Console.WriteLine("\nSelect date to reserve this movie:");
             DateTime RentDay = Convert.ToDateTime(Console.ReadLine());
             DateTime MaxReturnDate = RentDay.AddDays(2);
@@ -151,12 +151,12 @@ namespace VideoStoreApp
             //Here, we make the reservation and insert the reservation data in the Reservation Table (DB).
             string insertQuery = $" INSERT INTO Reservation (RentDay, MaxReturnDate, Customer_id, Film_id) values ('{RentDay}', '{MaxReturnDate}', '{customer.Customer_id}', {answer})";
             DTOReaderAndConnection sqlData1 = DatabaseConnections.QueryExecute(insertQuery);
-            sqlData.Connection.Close();
+            sqlData1.Connection.Close();
 
             //And now, we update the Table Film (DB) with the film selected to 'not available'
             string updateQuery = $"UPDATE Film set Available = 1 where Film_id = {answer}";
             DTOReaderAndConnection sqlData2 = DatabaseConnections.QueryExecute(updateQuery);
-            sqlData.Connection.Close();
+            sqlData2.Connection.Close();
 
             Console.ForegroundColor = ConsoleColor.Blue;
             Console.WriteLine($"You have made a reservation on the day {RentDay.ToShortDateString()}. The film should be returned on {MaxReturnDate.ToShortDateString()}.");
@@ -168,25 +168,33 @@ namespace VideoStoreApp
             Console.WriteLine("Your reservations:\n");
             string query = $"select Reservation_id, RentDay, MaxReturnDate, title from Reservation r, Film f where f.Film_id = r.Film_id and Customer_id = {customer.Customer_id}";
             DTOReaderAndConnection sqlData = DatabaseConnections.QueryExecute(query);
-            while (sqlData.Reader.Read())
+            if (sqlData.Reader.Read())
             {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Reservation Id: " + sqlData.Reader["Reservation_id"]);
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.WriteLine("Film title: " + sqlData.Reader["title"]);
-                Console.WriteLine("Rental date: " + sqlData.Reader["RentDay"]);
-                Console.ForegroundColor = ConsoleColor.Blue;
-                Console.WriteLine($"Maximum return date:  {(sqlData.Reader["MaxReturnDate"])}");
-                Console.ForegroundColor = ConsoleColor.White;
+                while (sqlData.Reader.Read())
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine("Reservation Id: " + sqlData.Reader["Reservation_id"]);
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.WriteLine("Film title: " + sqlData.Reader["title"]);
+                    Console.WriteLine("Rental date: " + sqlData.Reader["RentDay"]);
+                    Console.ForegroundColor = ConsoleColor.Blue;
+                    Console.WriteLine($"Maximum return date:  {(sqlData.Reader["MaxReturnDate"])}");
+                    Console.ForegroundColor = ConsoleColor.White;
+                }
                 Console.WriteLine("\nDo you want to return a movie? Yes/Back");
                 string answer = Console.ReadLine();
                 if (answer.ToLower() == "yes")
                 {
-                    sqlData.Connection.Close();
                     //AQUI HABRIA QUE METER UN TRY CATCH
-                    Console.WriteLine("Select the reservation id you want to return. Type 'back' to go back to main menu.");
+                    Console.Write("Select the ");
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.Write("reservation id");
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.Write(" you want to return. Type 'back' to go back to main menu.");
                     //If the customer wants to return a movie, it will be necessary to do an update in the Film table and a delete in the Reservation table.
                     string selectedId = Console.ReadLine();
+                    //PENDING I don't know how to check that the selected id entered is the one returned by the select. I have tried if (selectedId.Contains($"{sqlData.Reader["Reservation_id"]}")), but it fails to return anything.
+
                     if (selectedId.ToLower() == "back")
                     {
                         sqlData.Connection.Close();
@@ -197,30 +205,38 @@ namespace VideoStoreApp
                     {
                         sqlData.Connection.Close();
                         string queryUpdate = $"UPDATE Film set Available = 0 where Film_id = {selectedId}";
-                        //ME HE QUEDADO AQUI
-                        //QUERY DELETE
+                        DTOReaderAndConnection sqlData2 = DatabaseConnections.QueryExecute(queryUpdate);
+                        sqlData2.Connection.Close();
+                        string queryDelete = $"DELETE FROM Reservation WHERE Reservation_id = {selectedId}";
+                        DTOReaderAndConnection sqlData3 = DatabaseConnections.QueryExecute(queryDelete);
+                        sqlData2.Connection.Close();
+                        Console.WriteLine($"Your return with reservation id {selectedId} has been successfully accepted. You will be redirected to Main menu.");
+                        ShowMenu(customer);
                     }
 
                 }
                 else if (answer.ToLower() == "no" || answer.ToLower() == "back")
                 {
+                    sqlData.Connection.Close();
                     Console.WriteLine("Okay, you have been redirected to Main Menu.");
                     ShowMenu(customer);
                 }
                 else
                 {
+                    sqlData.Connection.Close();
                     Console.WriteLine("I don't understand what you mean. You have been redirected to Main Menu.");
                     ShowMenu(customer);
                 }
-
             }
-            sqlData.Connection.Close();
-            Console.WriteLine("There are no reserves. Try to do a reservation in '2- Rent a movie' section.");
-            ShowMenu(customer);
+            else
+            {
+                sqlData.Connection.Close();
+                Console.WriteLine("There are no reserves. Try to do a reservation in '2- Rent a movie' section.");
+                ShowMenu(customer);
+            }
         }
 
-
-
+        
         public static void Logout(Customer customer)
         {
             Console.WriteLine("Are you sure to logout? Yes/No");

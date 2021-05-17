@@ -15,18 +15,6 @@ namespace VideoStoreApp
 
         public bool Available { get; set; }
 
-        //public Film (int fiml_id, string title, string synopsis, int recommendedAge, bool avaliable)
-        //{
-        //    Film_id = fiml_id;
-        //    Title = title;
-        //    Synopsis = synopsis;
-        //    RecommendedAge = recommendedAge;
-        //    Available = avaliable;
-        //}NO ME HACE FALTA DE MOMENTO, PROBAR SIN EL
         
-        //public Film()
-        //{
-
-        //}
     }
 }
