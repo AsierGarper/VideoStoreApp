@@ -170,17 +170,18 @@ namespace VideoStoreApp
             DTOReaderAndConnection sqlData = DatabaseConnections.QueryExecute(query);
             if (sqlData.Reader.Read())
             {
-                while (sqlData.Reader.Read())
-                {
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine("Reservation Id: " + sqlData.Reader["Reservation_id"]);
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.WriteLine("Film title: " + sqlData.Reader["title"]);
-                    Console.WriteLine("Rental date: " + sqlData.Reader["RentDay"]);
-                    Console.ForegroundColor = ConsoleColor.Blue;
-                    Console.WriteLine($"Maximum return date:  {(sqlData.Reader["MaxReturnDate"])}");
-                    Console.ForegroundColor = ConsoleColor.White;
-                }
+
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Reservation Id: " + sqlData.Reader["Reservation_id"]);
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.WriteLine("Film title: " + sqlData.Reader["title"]);
+                Console.WriteLine("Rental date: " + sqlData.Reader["RentDay"]);
+                Console.ForegroundColor = ConsoleColor.Blue;
+                Console.WriteLine($"Maximum return date:  {(sqlData.Reader["MaxReturnDate"])}");
+                Console.ForegroundColor = ConsoleColor.White;
+
+                //ESTO ESTA MAL, TIENEN QUE SALIR MAS PELICULAS Y SI HAGO UN WHILE PETA
+
                 Console.WriteLine("\nDo you want to return a movie? Yes/Back");
                 string answer = Console.ReadLine();
                 if (answer.ToLower() == "yes")
@@ -236,7 +237,7 @@ namespace VideoStoreApp
             }
         }
 
-        
+
         public static void Logout(Customer customer)
         {
             Console.WriteLine("Are you sure to logout? Yes/No");
