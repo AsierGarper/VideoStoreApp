@@ -168,20 +168,40 @@ namespace VideoStoreApp
             Console.WriteLine("Your reservations:\n");
             string query = $"select Reservation_id, RentDay, MaxReturnDate, title from Reservation r, Film f where f.Film_id = r.Film_id and Customer_id = {customer.Customer_id}";
             DTOReaderAndConnection sqlData = DatabaseConnections.QueryExecute(query);
-            if (sqlData.Reader.Read())
+
+            //To see the movies that a user has reserved, we are going to create this virtual object, that is to say, an object that takes values from two different tables of the database.
+            //It is like a non-real table, where all the fields of the Reservations Table are contained, together with the 'Title' field of the Fimls Table.
+            //This way, in MoviesMenu.CustomerReservations we are going to create a list of DTOFilmsReservations called filmsReservations (in plural), with objects 'filmReservation' where to store the values of each movie.
+            List<DTOFilmsReservation> filmsReservations = new List<DTOFilmsReservation>();
+
+
+            if (sqlData.Reader.HasRows)
             {
+                while (sqlData.Reader.Read())
+                {
+                    //Creating in this way a list 'FilmsReservations' with objects 'fimlReservation' with the values of EACH movie.
+                    DTOFilmsReservation filmsReservation = new DTOFilmsReservation();
+                    filmsReservation.Title = sqlData.Reader["title"].ToString();
+                    filmsReservation.Reservation_id = Convert.ToInt32(sqlData.Reader["Reservation_id"]);
+                    filmsReservation.RentDay = Convert.ToDateTime(sqlData.Reader["RentDay"]);
+                    filmsReservation.MaxReturnDay = Convert.ToDateTime(sqlData.Reader["MaxReturnDate"]);
 
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Reservation Id: " + sqlData.Reader["Reservation_id"]);
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.WriteLine("Film title: " + sqlData.Reader["title"]);
-                Console.WriteLine("Rental date: " + sqlData.Reader["RentDay"]);
-                Console.ForegroundColor = ConsoleColor.Blue;
-                Console.WriteLine($"Maximum return date:  {(sqlData.Reader["MaxReturnDate"])}");
-                Console.ForegroundColor = ConsoleColor.White;
+                    //And we add, in each while, a movie (filmsReservation) with all the data in one position of the list (filmsReservations)
+                    filmsReservations.Add(filmsReservation);
+                }
 
-                //ESTO ESTA MAL, TIENEN QUE SALIR MAS PELICULAS Y SI HAGO UN WHILE PETA
-
+                foreach (DTOFilmsReservation filmsReservation in filmsReservations)
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine("Reservation Id: " + filmsReservation.Reservation_id);
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.WriteLine("Film title: " + filmsReservation.Title);
+                    Console.WriteLine("Rental date: " + filmsReservation.RentDay);
+                    Console.ForegroundColor = ConsoleColor.Blue;
+                    Console.WriteLine("Maximum return date: " + filmsReservation.MaxReturnDay);
+                    Console.ForegroundColor = ConsoleColor.White;
+                }
+                    
                 Console.WriteLine("\nDo you want to return a movie? Yes/Back");
                 string answer = Console.ReadLine();
                 if (answer.ToLower() == "yes")
