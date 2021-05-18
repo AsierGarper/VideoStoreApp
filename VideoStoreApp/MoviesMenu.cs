@@ -8,10 +8,10 @@ namespace VideoStoreApp
 {
     class MoviesMenu
     {
-        //● Ver películas disponibles: Aquí tendremos que desplegar una lista de películas teniendo en cuenta la edad del usuario, si tiene menos de 18 años le aparecerán las películas recomendadas para esa edad, si tiene menos de 16, las recomendadas para menores de 16, etc. Aparecerán todas las películas de la BBDD incluidas las que están alquiladas.
-        //Si el usuario selecciona una de ellas, se le mostrará todos los datos referentes a esa película.
-        //● Alquilar película: aquí podrán alquilar la película que deseen siempre que esté disponible y la edad recomendada sea la adecuada. Una vez alquilada, la película deberá pasar a modo no disponible.
-        //● Mis alquileres: aquí podrán ver las películas que tienen alquiladas y cuando vence el plazo de alquiler.Cuando el plazo haya expirado, les tendrá que aparecer la película en color rojo.Podrán entregar la película que hayan alquilado, la cual se volverá a poner en modo disponible.
+        //View available movies: Here we will have to display a list of movies taking into account the user's age, if he/she is under 18 years old, the movies recommended for that age will appear, if he/she is under 16, the movies recommended for children under 16, etc. All the movies in the database will appear, including those that are rented.
+        //If the user selects one of them, all the data related to that movie will be shown.
+        //Rent movie: here they can rent the movie they want as long as it is available and the recommended age is appropriate. Once rented, the movie should be switched to unavailable mode.
+        //● My rentals: here you can see the movies you have rented and when the rental period expires.When the period has expired, the movie should appear in red.You can return the movie you have rented, which will be put back into available mode.
         //● Logout.
         public static void ShowMenu(Customer customerData)
         {
@@ -34,7 +34,7 @@ namespace VideoStoreApp
                         break;
                     case 3:
                         CustomerReservations(customerData);
-                        //Tiene que tener la opcion de DEVOLVER PELICULA, 
+                        
                         break;
                     case 4:
                         Logout(customerData);
@@ -48,10 +48,10 @@ namespace VideoStoreApp
         public static void AvailableFilms(Customer customer) //We call the AvailableFilms method passing it the object Customer, with all the data of himself saved when we generate the object in LoginMenu.LogIn.
         {
             Console.WriteLine($"Since you are {customer.CustomerAge()} years old, the movies recommended for you are the following:");
-            string query = $"SELECT * FROM Film where RecommendedAge<={customer.CustomerAge()}"; //Este es el mensaje que se va a enviar, pidiendo las peliculas cuya edad recomendada es inferior a la edad del usuario.
+            string query = $"SELECT * FROM Film where RecommendedAge<={customer.CustomerAge()}"; //This is the message that will be sent, asking for movies whose recommended age is lower than the user's age.
             DTOReaderAndConnection sqlData = DatabaseConnections.QueryExecute(query);
 
-            List<Film> films = new List<Film>(); //Creamos la lista de peliculas, sobre la que guardar las peliculas disponibles para dicho usuario.
+            List<Film> films = new List<Film>(); //We create the list of movies, on which to save the movies available for that user.
 
             while (sqlData.Reader.Read())
             {
@@ -68,19 +68,19 @@ namespace VideoStoreApp
                 else
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Not Available");//CONVENIENTE PONER LA FECHA DE RETORNO, CUANDO LA DEVUELVAN
+                    Console.WriteLine("Not Available");//CONVENIENT TO PUT THE DATE OF RETURN, WHEN YOU RETURN IT
                     Console.ForegroundColor = ConsoleColor.White;
                 }
 
-                //Primera forma: crear el objeto directamente cuando hacemos el add en la lista
+                //First way: create the object directly when we do the add in the list
                 //films.Add(new Film
                 //{
                 //    Film_id = Convert.ToInt32(sqlData.Reader["Film_id"]),
 
                 //}) ;
 
-                //Para almacenar los datos, de CADA pelicula, almacenaremos la informacion en un objeto f 
-                //Segunda forma: primero creamos el objeto, y luego
+                //To store the data, for EACH movie, we will store the information in an f object. 
+                //Second way: first we create the object, and then
                 Film fList = new Film();
                 fList.Film_id = Convert.ToInt32(sqlData.Reader["Film_id"]);
                 fList.Title = Convert.ToString(sqlData.Reader["Title"]);
@@ -88,15 +88,15 @@ namespace VideoStoreApp
                 fList.RecommendedAge = Convert.ToInt32(sqlData.Reader["RecommendedAge"]);
                 fList.Available = Convert.ToBoolean(sqlData.Reader["Available"]);
 
-                //lo insertamos en la lista con el Add
-                films.Add(fList); //Y ahora, en la lista films tenemos almacenados todos los objetos fList de cada pelicula.
-                                  //Ahora, en la clase Film, tenemos almacenados los valores de cada objeto flist, y podemos acceder a ellos, usando el while reader.Read y escribir Flist.Film_id, o fList.Title por ejemplo
+                //we insert it in the list with the Add
+                films.Add(fList); //And now, in the films list we have stored all the fList objects of each movie.
+                                  //Now, in the Film class, we have stored the values of each flist object, and we can access them, using the while reader.Read and write Flist.Film_id, or fList.Title for example.
 
             }
 
             sqlData.Connection.Close(); //Segun se ejecuta el codigo, cerrar la conexion para mayor seguridad.
 
-            //------------------------INFO EXTRA DE LAS PELICULAS------------------
+            //------------------------EXTRA INFO ABOUT THE MOVIES------------------
 
             Console.WriteLine("\nSelect the id of your movie to advance:");
             string selectedId = Console.ReadLine();

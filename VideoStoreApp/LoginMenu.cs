@@ -9,13 +9,13 @@ namespace VideoStoreApp
     {
         public static void MainMenu()
         {
-            //aqui crear, con metodos, el login, el register y el logout. Si es satisfactorio el login, pasar a MoviesMenu
+            //here create, with methods, the login, the register and the logout. If the login is successful, go to MoviesMenu.
             bool menu = true;
             while (menu)
             {
                 Console.WriteLine("Welcome to the most famous Videostore in your town! Log in to access the largest movie catalog on the internet!");
                 Console.WriteLine("Select the option you want to perform:");
-                Console.WriteLine("\n 1-Login \n 2-Register\n"); //\n 3-Logout METER MAS ADELANTE
+                Console.WriteLine("\n 1-Login \n 2-Register\n");
                 int selection = Convert.ToInt32(Console.ReadLine());
 
                 switch (selection)
@@ -63,7 +63,7 @@ namespace VideoStoreApp
 
                         //And this way, we have stored in the Customer class the values of the user navigating through the application. These values are going to be able to be called from anywhere, using the Customer class as a bridge.
 
-                        sqlData.Connection.Close();//Si el DNI existe, cerramos conexion.
+                        sqlData.Connection.Close();//If the DNI exists, we close the connection.
                         loginMenu = false; //In this way, when the DNI exists in the DB, we prevent it from re-entering the while.
                         Console.WriteLine("Successful login.");
                         MoviesMenu.ShowMenu(customerData);//If the login is correct, show the movie menu.
@@ -72,7 +72,7 @@ namespace VideoStoreApp
                     {
                         Console.WriteLine("Incorrect login. Please try again.");
                     }
-                    sqlData.Connection.Close(); //Si no existe el DNI, cerramos conexion, y vuelve al while 
+                    sqlData.Connection.Close(); //If the DNI does not exist, close the connection, and return to while 
                 }
             }
         }

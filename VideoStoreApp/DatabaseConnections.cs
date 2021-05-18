@@ -12,18 +12,18 @@ namespace VideoStoreApp
         public static DTOReaderAndConnection QueryExecute(string query)
         {
             DTOReaderAndConnection sqlData = new DTOReaderAndConnection();
-            sqlData.Reader = null; //Inicializamos el reader en 'null' 
+            sqlData.Reader = null; //Initialize the reader to 'null'. 
             sqlData.Connection = connection;
             
-            SqlCommand command = new SqlCommand(query, connection); //Se crea el objeto con el mensaje a enviar y la conexion a la que enviarselo
-            connection.Open(); //Abro la conexion
-            if (query.ToUpper().Contains("SELECT")) //Como en las SELECT el reader tiene que devolver algo, hacemos eso.
+            SqlCommand command = new SqlCommand(query, connection); //The object is created with the message to be sent and the connection to send it to.
+            connection.Open(); //I open the connection
+            if (query.ToUpper().Contains("SELECT")) //As in the SELECT the reader has to return something, we do that.
             {
-                sqlData.Reader = command.ExecuteReader(); //Ejecuta el comando donde tengo la query y la conexion
+                sqlData.Reader = command.ExecuteReader(); //Execute the command where I have the query and connection
             }
             else
             {
-                command.ExecuteNonQuery(); //para los UPDATE, INSERT Y DELETE, el reader no deberia volver nada
+                command.ExecuteNonQuery(); //for UPDATE, INSERT and DELETE, the reader should not return anything.
             }
            
             return sqlData;
