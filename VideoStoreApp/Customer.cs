@@ -29,10 +29,11 @@ namespace VideoStoreApp
         }
         public int CustomerAge()
         {
-            //Here, I have to calculate the age of the user who is using the application. 
-            //And based on that age, show him the movies whose recommended age does not exceed the age of the client.
-            int today = Convert.ToInt32(DateTime.Now.Year);
-            int customerAge = today - (Convert.ToInt32((Birthday).Year));//We collect the accumulated Birthday value in Customer.Birthday, and calculate the age with respect to today's date.
+            ////Here, I have to calculate the age of the user who is using the application. 
+            ////And based on that age, show him the movies whose recommended age does not exceed the age of the client.
+            int customerAge = Convert.ToInt32(Math.Floor((DateTime.Now - Birthday).Days/365.25));
+            //We collect the accumulated Birthday value in Customer.Birthday, and calculate the age with respect to today's date. We use Math.Floor to round down, as the user may not have reached the age of the current year.
+
             return customerAge;
         }
 
